@@ -5,7 +5,6 @@ from . import views
 
 
 urlpatterns = [
-    path('pag', paginaPrincipal, name='paginaPrincipal'),
-    path('logout/', exit, name= 'exit'),
-    path('inventario/', views.lista_producto, name='productos')
+    path('logout/', exit, name= 'exit'),                        #dirrecion para regresar al login 
+    path('inventario/', views.lista_producto, name='productos') #dirrecion url para ver el inventario
 ]

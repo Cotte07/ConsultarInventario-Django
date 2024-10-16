@@ -106,11 +106,22 @@
         </thead>
         <tbody>
           {% for producto in productos %}
+          {% for loteHistorial in loteHistorial %}
+          {% for historial in historial %}
+          {% for lote in lote %}
             <tr>
               <td> {{producto.nombre}} </td>
-              <td> {{producto.Proveedor}} </td>
-              <td></td>
+              <td> {{loteHistorial.cantidad}} </td>
+              <td> {{loteHistorial.unidad_medida}} </td>
+              <td> {{loteHistorial.precio_compra}} </td>
+              <td> {{historial.fecha_compra}} </td>
+              <td> {{producto.proveedor}} </td>
+              <td> {{lote.id}} </td>
+              <td> {{lote.estado}} </td>
             </tr>
+            {% endfor %}
+            {% endfor %}
+            {% endfor %}
             {% endfor %}
         </tbody>
       </table>

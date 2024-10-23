@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'consultarInv',
+    'agregarProductoNuevo',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'crudInventario.urls'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4200"
+]
 
 TEMPLATES = [
     {

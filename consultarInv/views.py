@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from .models import Producto, Historial, Categoria, Lote, Lote_Historial
 from django.http.response import JsonResponse
+from django import views
 
 
 # Create your views here.

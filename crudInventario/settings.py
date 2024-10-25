@@ -32,18 +32,28 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'corsheaders',
+    'consultarInv.apps.ConsultarinvConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'consultarInv',
     'agregarProductoNuevo',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',    #agregamos el uso de tokens para autenticar el login
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -54,7 +64,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'crudInventario.urls'
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200"
+    "http://localhost:4200" #puerto a la que se comunica con Angular
 ]
 
 TEMPLATES = [
@@ -79,7 +89,7 @@ WSGI_APPLICATION = 'crudInventario.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
+DATABASES = {       #esta es la conexion con la base de datos Postgres
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "postgres",

@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from rest_framework import viewsets
+from rest_framework.response import Response
 from django.contrib.auth import logout
 from .models import Producto, Historial, Categoria, Lote, Lote_Historial
 from django.http.response import JsonResponse
@@ -6,6 +8,10 @@ from django import views
 
 
 # Create your views here.
+class vistaPrueba(viewsets.ViewSet):
+    def list(self, request):
+        return Response({"info": "oscar"})
+
 
 def paginaPrincipal(request):       #vista para mostrar la pagina principal
     return render(request, 'PaginaPrincipal.html')

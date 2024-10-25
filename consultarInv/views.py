@@ -5,6 +5,7 @@ from django.contrib.auth import logout
 from .models import Producto, Historial, Categoria, Lote, Lote_Historial
 from django.http.response import JsonResponse
 from django import views
+from .serializers import ProductoSerializer
 
 
 # Create your views here.
@@ -12,6 +13,11 @@ class vistaPrueba(viewsets.ViewSet):
     def list(self, request):
         return Response({"info": "oscar"})
 
+class listaProductos(viewsets.ViewSet):
+    def list(self, request):
+        productos = Producto.objects.all()  # Obtener todos los productos
+        serializer = ProductoSerializer(productos, many=True)  # Serializar los productos
+        return Response(serializer.data)  # Devolver los datos serializados en la respuesta
 
 def paginaPrincipal(request):       #vista para mostrar la pagina principal
     return render(request, 'PaginaPrincipal.html')

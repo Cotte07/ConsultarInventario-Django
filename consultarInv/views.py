@@ -1,11 +1,10 @@
-from django.shortcuts import render, redirect
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from django.contrib.auth import logout
-from .models import Producto, Historial, Categoria, Lote, Lote_Historial, ConsultaProductos
-from django.http.response import JsonResponse
+from django.http import JsonResponse
+from .models import Producto, Historial, Categoria, Lote, Lote_Historial
 from django import views
-from .serializers import ProductoSerializer, LoteHistorialSerialiazer, ConsultaProductosSerializer
+from .serializers import ProductoSerializer, LoteHistorialSerialiazer
+from .queries import obtener_inventario
 
 
 # Create your views here.
@@ -21,16 +20,6 @@ class listaLoteHistorial(viewsets.ReadOnlyModelViewSet): #lista para campos de l
     queryset = Lote_Historial.objects.all()
     serializer_class = LoteHistorialSerialiazer
 
-class ConsultaProductosViewSet(viewsets.ViewSet):      #lista de los campos de la consulta de productos
-    
-    def list(self, request):
-        try:  
-
-            productos = ConsultaProductos.obtener_datos_productos_raw()
-            serializer = ConsultaProductosSerializer(productos, many=True)
-            return Response(serializer.data)
-        except Exception as e: 
-            return Response(
-                {'error': str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+def inventario_view(request):
+    inventario = obtener_inventario()
+    return JsonResponse(inventario, safe=False)

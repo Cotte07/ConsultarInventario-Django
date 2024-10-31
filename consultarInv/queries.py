@@ -1,20 +1,11 @@
-from django.db.models import Prefetch 
+from django.db.models.functions import Now, Concat, ExtractDay, ExtractMonth, ExtractYear, Extract
+from django.db.models import F, Value, CharField, IntegerField, ExpressionWrapper, DurationField
+from django.db.models.functions import Cast
 from typing import List, Dict, Any
-from django.db.models.functions import Concat
-from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
-from django.db.models import Value, CharField, F
-
-from .models import Producto, Lote, Historial, Lote_Historial, Categoria
-
+from .models import Lote_Historial
 
 def obtener_inventario() -> List[Dict[Any, Any]]:
-    """
-    Obtiene el inventario completo con información detallada y fecha formateada.
     
-    Returns:
-        List[Dict]: Lista de diccionarios con la información del inventario,
-        incluyendo la fecha en formato 'DD/MM/YYYY'
-    """
     inventario = (
         Lote_Historial.objects
         .select_related('id_lote', 'id_historial')
@@ -26,7 +17,11 @@ def obtener_inventario() -> List[Dict[Any, Any]]:
             fecha_formateada=Concat(
                 F('dia'), Value('/'), F('mes'), Value('/'), F('anio'),
                 output_field=CharField()
-            )
+            ),
+            tiempoBodega=ExpressionWrapper(
+                Extract(Now() - F('id_historial__fecha_compra'), 'epoch') / 86400,  # 86400 segundos en un día
+                output_field=IntegerField()
+)
         )
         .values(
             'id_lote__id_Producto__nombre',
@@ -34,11 +29,11 @@ def obtener_inventario() -> List[Dict[Any, Any]]:
             'unidad_medida',
             'precio_compra',
             'fecha_formateada',
+            'tiempoBodega',
             'id_lote__id_Producto__proveedor',
             'id_lote__numero_lote',
             'id_lote__estado',
             'id_lote__id_Producto__id_categoria__nombre'
         )
     )
-    
     return list(inventario)

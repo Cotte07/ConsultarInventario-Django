@@ -10,6 +10,11 @@ class Producto(models.Model):   #tabla productos de la bd
     nombre =    models.CharField(max_length=30)
     proveedor = models.CharField(max_length=20)
     id_categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT, null=True )
+    estado = models.BooleanField(default=True)  #True significa activo, False inactivo en inventario.
+
+    def eliminar_del_inventario(self):
+        self.estado = False
+        self.save()
 
 class Historial(models.Model):      #tabla historial de la bd
     fecha_compra = models.DateTimeField(auto_now_add=True)
@@ -23,7 +28,7 @@ class Lote(models.Model):   #tabla lote de la bd
 class Lote_Historial(models.Model):     #tabla intermedia entre lote e historial
     id_lote = models.ForeignKey(Lote, on_delete=models.PROTECT, null=True)
     id_historial = models.ForeignKey(Historial, on_delete=models.PROTECT, null=True)
-    cantidad = models.DecimalField(max_digits=9, decimal_places=2)
+    cantidad = models.DecimalField(max_digits=9, decimal_places=0)
     unidad_medida = models.CharField(max_length=20)
     precio_compra = models.DecimalField(max_digits=9, decimal_places=2)
 

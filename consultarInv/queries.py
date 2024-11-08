@@ -10,6 +10,7 @@ def obtener_inventario() -> List[Dict[Any, Any]]:
         Lote_Historial.objects
         .select_related('id_lote', 'id_historial')
         .prefetch_related('id_lote__id_Producto__id_categoria')
+        .filter(id_lote__id_Producto__estado=True) 
         .annotate(
             dia=ExtractDay('id_historial__fecha_compra'),
             mes=ExtractMonth('id_historial__fecha_compra'),
@@ -28,7 +29,9 @@ def obtener_inventario() -> List[Dict[Any, Any]]:
             )
         )
         .values(
+            'id_lote__id_Producto__id',
             'id_lote__id_Producto__nombre',
+            'id_lote__id_Producto__estado',
             'cantidad',
             'unidad_medida',
             'precio_compra',

@@ -12,7 +12,7 @@ class Producto(models.Model):   #tabla productos de la bd
     id_categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT, null=True )
     estado = models.BooleanField(default=True)  #True significa activo, False inactivo en inventario.
 
-    def eliminar_del_inventario(self):
+    def eliminar_del_inventario(self):  #funcion para cambiar el estado de los productos
         self.estado = False
         self.save()
 

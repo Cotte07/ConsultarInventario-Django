@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-m5m8e_#8#6@854fw@@tdqio6b$)43f6c1+_+$j@%abafocw16)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'agregarProductoNuevo',
     'rest_framework',
     'rest_framework.authtoken',
 ]
@@ -47,7 +46,10 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',    #agregamos el uso de tokens para autenticar el login
-    ]
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  #esto asegura que el usuario esté autenticado
+    ],
 }
 
 MIDDLEWARE = [
@@ -63,9 +65,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'crudInventario.urls'
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200" #puerto a la que se comunica con Angular
-]
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 TEMPLATES = [
     {
@@ -141,3 +142,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CSRF_TRUSTED_ORIGINS = ['http://localhost:4200']

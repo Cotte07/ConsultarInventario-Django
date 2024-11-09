@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
 
 
 class listaProductos(viewsets.ReadOnlyModelViewSet):    #lista de los productos que necesito de los modelos
@@ -81,3 +82,63 @@ def eliminar_producto(request, producto_id):        #funcion para desahibilitar 
         return JsonResponse({'success': True})
     except Producto.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Producto no encontrado'}, status=404)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def actualizar_producto(request, producto_id):
+    try:
+        with transaction.atomic():
+            #obtener el producto y sus relaciones
+            producto = get_object_or_404(Producto, id=producto_id)
+            categoria = producto.id_categoria
+            lote = Lote.objects.filter(id_Producto=producto).first()
+            
+            if not lote:
+                return Response({'error': 'No se encontró el lote asociado al producto'}, status=404)
+                
+            lote_historial = Lote_Historial.objects.filter(id_lote=lote).first()
+            
+            if not lote_historial:
+                return Response({'error': 'No se encontró el historial asociado al lote'}, status=404)
+            
+            historial = lote_historial.id_historial
+
+            #actualizar producto
+            if 'proveedor' in request.data:
+                producto.proveedor = request.data['proveedor']
+            producto.save()
+            
+            #actualizar lote
+            if 'fecha_Rotacion' in request.data:
+                lote.fecha_Rotacion = request.data['fecha_Rotacion']
+            if 'estado' in request.data:
+                lote.estado = request.data['estado']
+            lote.save()
+            
+            #actualizar lote_historial
+            if 'cantidad' in request.data:
+                lote_historial.cantidad = request.data['cantidad']
+            if 'unidad_medida' in request.data:
+                lote_historial.unidad_medida = request.data['unidad_medida']
+            if 'precio_compra' in request.data:
+                lote_historial.precio_compra = request.data['precio_compra']
+            lote_historial.save()
+
+            #actualizar historial
+            if 'fecha_compra' in request.data:
+                historial.fecha_compra = request.data['fecha_compra']
+                historial.save()
+
+            return Response({
+                'mensaje': 'Producto actualizado correctamente',
+                'producto_id': producto.id,
+                'lote_id': lote.id,
+                'historial_id': lote_historial.id_historial.id,
+            })
+            
+    except Exception as e:
+        return Response({
+            'error': f'Error al actualizar el producto: {str(e)}'
+        }, status=400)

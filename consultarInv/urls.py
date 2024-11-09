@@ -14,4 +14,5 @@ urlpatterns = [
     path('guardarDatos/', views.guardar_datos, name='guardar_datos'),
     path('eliminar_producto/<int:producto_id>/', views.eliminar_producto, name='eliminar_producto'),
     path('api-token-auth/', auth_views.obtain_auth_token),
+    path('actualizar_producto/<int:producto_id>/', views.actualizar_producto, name='actualizar_producto'),
 ]

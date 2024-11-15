@@ -115,6 +115,8 @@ def actualizar_producto(request, producto_id):
                 lote.fecha_Rotacion = request.data['fecha_Rotacion']
             if 'estado' in request.data:
                 lote.estado = request.data['estado']
+            if 'num_lote' in request.data:
+                lote.numero_lote = request.data['num_lote']
             lote.save()
             
             #actualizar lote_historial

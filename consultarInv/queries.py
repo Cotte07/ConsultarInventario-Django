@@ -3,7 +3,7 @@ from django.db.models import F, Value, CharField, IntegerField, ExpressionWrappe
 from django.db.models.functions import Cast
 from typing import List, Dict, Any
 from .models import Lote_Historial
-
+# Consulta la base de datos en el inventario para los productos con el estado true
 def obtener_inventario() -> List[Dict[Any, Any]]:
     
     inventario = (

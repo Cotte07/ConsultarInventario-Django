@@ -7,7 +7,7 @@ from rest_framework.authtoken import views as auth_views
 
 router = DefaultRouter()
 router.register(r'producto',listaProductos)
-
+#endpoints para usar los metodos de views.py
 urlpatterns = [
     path('inventario/', inventario_view, name='inventario'),
     path('producto/', include(router.urls)),

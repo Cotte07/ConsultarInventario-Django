@@ -11,17 +11,49 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
-
+from rest_framework.exceptions import AuthenticationFailed
+from django.middleware.csrf import get_token
+from django.http import JsonResponse
 
 class listaProductos(viewsets.ReadOnlyModelViewSet):    #lista de los productos que necesito de los modelos
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
 
-def inventario_view(request):               #me trae todos los datos del inventario
+
+def role_required(roles):
+    def decorator(view_func):
+        def _wrapped_view(request, *args, **kwargs):
+            # Autenticación basada en token
+            auth = TokenAuthentication()
+            try:
+                auth_result = auth.authenticate(request)
+                if auth_result is None:
+                    return JsonResponse({'detail': 'Token no válido o ausente.'}, status=401)
+                user, _ = auth_result
+            except AuthenticationFailed:
+                return JsonResponse({'detail': 'Autenticación fallida.'}, status=402)
+            
+            # Verificar si el usuario tiene un perfil asociado
+            if not hasattr(user, 'profile'):
+                return JsonResponse({'detail': 'El usuario no tiene un perfil asociado.'}, status=403)
+
+            # Verificar el rol del usuario
+            if user.profile.role not in roles:
+                return JsonResponse({'detail': f'No tienes permisos como {roles}.'}, status=403)
+            
+            # Llamar a la vista original
+            return view_func(request, *args, **kwargs)
+        return _wrapped_view
+    return decorator
+
+
+def inventario_view(request):  #me trae todos los datos del inventario
     inventario = obtener_inventario()
     return JsonResponse(inventario, safe=False)
 
 
+@csrf_exempt
+@role_required(['gerente'])    #asignar los roles 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
@@ -70,11 +102,11 @@ def guardar_datos(request):
     except Exception as e:
         return Response({'error': str(e)}, status=400)
 
-@csrf_exempt  # Deshabilita la verificación CSRF en esta vista
+@csrf_exempt
+@role_required(['gerente'])    #asignar los roles
 @require_POST
 @permission_classes([IsAuthenticated])  # Asegura que el usuario esté autenticado
 @authentication_classes([TokenAuthentication])
-
 def eliminar_producto(request, producto_id):        #funcion para desahibilitar la visibilidad del producto en el inventario como forma de 'eliminar'
     try:
         producto = Producto.objects.get(id=producto_id)
@@ -84,6 +116,8 @@ def eliminar_producto(request, producto_id):        #funcion para desahibilitar 
         return JsonResponse({'success': False, 'error': 'Producto no encontrado'}, status=404)
 
 
+@csrf_exempt
+@role_required(['gerente'])    #asignar los roles
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
